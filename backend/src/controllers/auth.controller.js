@@ -7,7 +7,7 @@ exports.signup = async(req,res)=>{
  const hash = await bcrypt.hash(password,10)
 
  const b = await db.query(
-  'INSERT INTO businesses(name) VALUES() RETURNING id',[business]
+  'INSERT INTO businesses(name) VALUES($1) RETURNING id',[business]
  )
 
  const u = await db.query(
@@ -16,9 +16,12 @@ exports.signup = async(req,res)=>{
  )
 
  await db.query(
-  'INSERT INTO subscriptions(business_id,plan,start_date,end_date) VALUES(,,NOW(),NOW()+INTERVAL ''30 days'')',
-  [b.rows[0].id,'trial']
- )
+  `INSERT INTO subscriptions
+   (business_id, plan, start_date, end_date)
+   VALUES ($1, $2, NOW(), NOW() + INTERVAL '30 days')`,
+  [b.rows[0].id, 'trial']
+)
+
 
  const token = jwt.sign(
   {uid:u.rows[0].id,bid:b.rows[0].id,role:'owner'},
