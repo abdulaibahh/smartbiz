@@ -1,4 +1,4 @@
-﻿CREATE TABLE businesses(
+CREATE TABLE IF NOT EXISTS businesses(
  id SERIAL PRIMARY KEY,
  name TEXT NOT NULL,
  address TEXT,
@@ -6,7 +6,7 @@
  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
-CREATE TABLE users(
+CREATE TABLE IF NOT EXISTS users(
  id SERIAL PRIMARY KEY,
  business_id INT REFERENCES businesses(id),
  full_name TEXT,
@@ -16,7 +16,7 @@ CREATE TABLE users(
  active BOOLEAN DEFAULT TRUE
 );
 
-CREATE TABLE subscriptions(
+CREATE TABLE IF NOT EXISTS subscriptions(
  id SERIAL PRIMARY KEY,
  business_id INT,
  plan TEXT,
@@ -25,7 +25,7 @@ CREATE TABLE subscriptions(
  active BOOLEAN DEFAULT TRUE
 );
 
-CREATE TABLE customers(
+CREATE TABLE IF NOT EXISTS customers(
  id SERIAL PRIMARY KEY,
  business_id INT,
  full_name TEXT,
@@ -33,7 +33,7 @@ CREATE TABLE customers(
  balance NUMERIC DEFAULT 0
 );
 
-CREATE TABLE sales(
+CREATE TABLE IF NOT EXISTS sales(
  id SERIAL PRIMARY KEY,
  business_id INT,
  user_id INT,
