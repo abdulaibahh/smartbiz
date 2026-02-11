@@ -43,3 +43,14 @@ CREATE TABLE IF NOT EXISTS sales(
  payment_method TEXT,
  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
+
+CREATE TABLE IF NOT EXISTS payments (
+    id SERIAL PRIMARY KEY,
+    business_id INT REFERENCES businesses(id) ON DELETE CASCADE,
+    amount DECIMAL(10,2) NOT NULL,
+    method VARCHAR(50),
+    status VARCHAR(20) DEFAULT 'pending',
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+
