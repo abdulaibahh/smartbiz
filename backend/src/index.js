@@ -3,6 +3,14 @@ const express = require('express')
 const helmet = require('helmet')
 const morgan = require('morgan')
 const rate = require('express-rate-limit')
+const cors = require('cors')
+
+app.use(cors({
+  origin: [
+    'https://smartbiz-psi.vercel.app/'
+  ],
+  credentials: true
+}))
 
 const app = express()
 app.use(express.json())
