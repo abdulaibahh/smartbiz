@@ -1,55 +1,57 @@
-'use client'
+"use client";
 
-import { useState } from 'react'
-import { useRouter } from 'next/navigation'
+import { useState } from "react";
+import { signup } from "@/lib/api";
+import { useRouter } from "next/navigation";
 
 export default function SignupPage() {
-  const router = useRouter()
+  const router = useRouter();
   const [form, setForm] = useState({
-    name: '',
-    email: '',
-    password: '',
-    business: ''
-  })
-  const [error, setError] = useState('')
+    name: "",
+    email: "",
+    password: "",
+  });
 
-  const submit = async (e: any) => {
-    e.preventDefault()
-    setError('')
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
 
-    const res = await fetch(
-      `${process.env.NEXT_PUBLIC_API_URL}/api/auth/signup`,
-      {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(form)
-      }
-    )
+    const res = await signup(form);
 
-    const data = await res.json()
-
-    if (!res.ok) {
-      setError(data.error || 'Signup failed')
-      return
+    if (res.token) {
+      localStorage.setItem("token", res.token);
+      router.push("/dashboard");
+    } else {
+      alert(res.message || "Signup failed");
     }
-
-    localStorage.setItem('token', data.token)
-    router.push('/dashboard')
-  }
+  };
 
   return (
-    <div className="max-w-md mx-auto mt-20">
-      <h1 className="text-2xl font-bold mb-4">Create Account</h1>
+    <div style={{ padding: 40 }}>
+      <h1>Sign Up</h1>
 
-      {error && <p className="text-red-500">{error}</p>}
+      <form onSubmit={handleSubmit}>
+        <input
+          placeholder="Name"
+          value={form.name}
+          onChange={(e) => setForm({ ...form, name: e.target.value })}
+        /><br /><br />
 
-      <form onSubmit={submit} className="space-y-3">
-        <input placeholder="Full name" onChange={e => setForm({ ...form, name: e.target.value })} />
-        <input placeholder="Business name" onChange={e => setForm({ ...form, business: e.target.value })} />
-        <input placeholder="Email" onChange={e => setForm({ ...form, email: e.target.value })} />
-        <input type="password" placeholder="Password" onChange={e => setForm({ ...form, password: e.target.value })} />
-        <button className="bg-black text-white px-4 py-2 w-full">Sign up</button>
+        <input
+          placeholder="Email"
+          type="email"
+          value={form.email}
+          onChange={(e) => setForm({ ...form, email: e.target.value })}
+        /><br /><br />
+
+        <input
+          placeholder="Password"
+          type="password"
+          value={form.password}
+          onChange={(e) => setForm({ ...form, password: e.target.value })}
+        /><br /><br />
+
+        <button type="submit">Create Account</button>
       </form>
     </div>
-  )
+  );
 }
