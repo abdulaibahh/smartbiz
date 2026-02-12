@@ -4,6 +4,7 @@ export async function signup(data: {
   name: string;
   email: string;
   password: string;
+  business: string;
 }) {
   const res = await fetch(`${API_URL}/api/auth/signup`, {
     method: "POST",

@@ -6,10 +6,12 @@ import { useRouter } from "next/navigation";
 
 export default function SignupPage() {
   const router = useRouter();
+
   const [form, setForm] = useState({
     name: "",
     email: "",
     password: "",
+    business: "",
   });
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -21,7 +23,7 @@ export default function SignupPage() {
       localStorage.setItem("token", res.token);
       router.push("/dashboard");
     } else {
-      alert(res.message || "Signup failed");
+      alert(res.error || res.message || "Signup failed");
     }
   };
 
@@ -31,24 +33,34 @@ export default function SignupPage() {
 
       <form onSubmit={handleSubmit}>
         <input
-          placeholder="Name"
+          placeholder="Full Name"
           value={form.name}
           onChange={(e) => setForm({ ...form, name: e.target.value })}
-        /><br /><br />
+        />
+        <br /><br />
+
+        <input
+          placeholder="Business Name"
+          value={form.business}
+          onChange={(e) => setForm({ ...form, business: e.target.value })}
+        />
+        <br /><br />
 
         <input
           placeholder="Email"
           type="email"
           value={form.email}
           onChange={(e) => setForm({ ...form, email: e.target.value })}
-        /><br /><br />
+        />
+        <br /><br />
 
         <input
           placeholder="Password"
           type="password"
           value={form.password}
           onChange={(e) => setForm({ ...form, password: e.target.value })}
-        /><br /><br />
+        />
+        <br /><br />
 
         <button type="submit">Create Account</button>
       </form>
