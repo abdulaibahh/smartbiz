@@ -8,7 +8,7 @@ CREATE TABLE IF NOT EXISTS businesses(
 
 CREATE TABLE IF NOT EXISTS users(
  id SERIAL PRIMARY KEY,
- business_id INT REFERENCES businesses(id),
+ business_id INTEGER REFERENCES businesses(id),
  full_name TEXT,
  email TEXT UNIQUE,
  password_hash TEXT,
@@ -18,7 +18,7 @@ CREATE TABLE IF NOT EXISTS users(
 
 CREATE TABLE IF NOT EXISTS subscriptions(
  id SERIAL PRIMARY KEY,
- business_id INT,
+ business_id INTEGER,
  plan TEXT,
  start_date TIMESTAMP,
  end_date TIMESTAMP,
@@ -27,21 +27,21 @@ CREATE TABLE IF NOT EXISTS subscriptions(
 
 CREATE TABLE IF NOT EXISTS customers(
  id SERIAL PRIMARY KEY,
- business_id INT,
- full_name TEXT,
+ business_id INTEGER REFERENCES businesses(id),
+ full_name TEXT NOT NULL,
  phone TEXT,
  balance NUMERIC DEFAULT 0
 );
 
 CREATE TABLE IF NOT EXISTS sales(
- id SERIAL PRIMARY KEY,
- business_id INT,
- user_id INT,
- customer_id INT,
- total NUMERIC,
- paid NUMERIC,
- payment_method TEXT,
- created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+  id SERIAL PRIMARY KEY,
+  business_id INTEGER REFERENCES businesses(id),
+  user_id INTEGER REFERENCES users(id),
+  customer_id INTEGER REFERENCES customers(id),
+  total NUMERIC NOT NULL,
+  paid NUMERIC DEFAULT 0,
+  payment_method TEXT,
+  created_at TIMESTAMP DEFAULT NOW()
 );
 
 CREATE TABLE IF NOT EXISTS payments (
