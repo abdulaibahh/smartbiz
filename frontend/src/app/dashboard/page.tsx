@@ -1,109 +1,123 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
-import { quickSale } from "@/lib/api";
-import { isLoggedIn, logout } from "@/lib/auth";
+import {
+  quickSale,
+  getSales,
+  addCustomer,
+  getCustomers,
+  getDashboardSummary,
+} from "@/lib/api";
 
-export default function DashboardPage() {
-  const router = useRouter();
+export default function Dashboard() {
+  const [summary, setSummary] = useState<any>({});
+  const [customers, setCustomers] = useState<any[]>([]);
+  const [sales, setSales] = useState<any[]>([]);
+  const [customerName, setCustomerName] = useState("");
 
-  const [form, setForm] = useState({
+  const [saleForm, setSaleForm] = useState({
     customer_id: "",
     total: "",
     paid: "",
     method: "cash",
   });
 
-  const [loading, setLoading] = useState(false);
+  async function loadData() {
+    setSummary(await getDashboardSummary());
+    setCustomers(await getCustomers());
+    setSales(await getSales());
+  }
 
   useEffect(() => {
-    if (!isLoggedIn()) {
-      router.push("/login");
-    }
-  }, [router]);
+    loadData();
+  }, []);
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  async function handleAddCustomer(e: any) {
     e.preventDefault();
-    setLoading(true);
+    await addCustomer(customerName);
+    setCustomerName("");
+    loadData();
+  }
 
-    const res = await quickSale({
-      customer_id: Number(form.customer_id),
-      total: Number(form.total),
-      paid: Number(form.paid),
-      method: form.method,
+  async function handleQuickSale(e: any) {
+    e.preventDefault();
+    await quickSale({
+      ...saleForm,
+      customer_id: Number(saleForm.customer_id),
+      total: Number(saleForm.total),
+      paid: Number(saleForm.paid),
     });
-
-    setLoading(false);
-
-    if (res.message) {
-      alert(res.message);
-      setForm({
-        customer_id: "",
-        total: "",
-        paid: "",
-        method: "cash",
-      });
-    } else {
-      alert(res.error || "Sale failed");
-    }
-  };
+    loadData();
+  }
 
   return (
     <div style={{ padding: 40 }}>
       <h1>Dashboard</h1>
-      <p>You are logged in 🎉</p>
 
-      <button onClick={logout}>Logout</button>
+      <h3>Summary</h3>
+      <p>Total Sales: {summary.total_sales}</p>
+      <p>Total Paid: {summary.total_paid}</p>
+      <p>Total Debt: {summary.total_debt}</p>
 
-      <hr style={{ margin: "30px 0" }} />
+      <hr />
 
-      <h2>Quick Sale</h2>
-
-      <form onSubmit={handleSubmit}>
+      <h3>Add Customer</h3>
+      <form onSubmit={handleAddCustomer}>
         <input
-          placeholder="Customer ID"
-          value={form.customer_id}
-          onChange={(e) =>
-            setForm({ ...form, customer_id: e.target.value })
-          }
+          value={customerName}
+          onChange={(e) => setCustomerName(e.target.value)}
+          placeholder="Customer Name"
         />
-        <br /><br />
+        <button>Add</button>
+      </form>
 
-        <input
-          placeholder="Total Amount"
-          value={form.total}
-          onChange={(e) =>
-            setForm({ ...form, total: e.target.value })
-          }
-        />
-        <br /><br />
+      <hr />
 
-        <input
-          placeholder="Paid Amount"
-          value={form.paid}
-          onChange={(e) =>
-            setForm({ ...form, paid: e.target.value })
-          }
-        />
-        <br /><br />
-
+      <h3>Quick Sale</h3>
+      <form onSubmit={handleQuickSale}>
         <select
-          value={form.method}
+          value={saleForm.customer_id}
           onChange={(e) =>
-            setForm({ ...form, method: e.target.value })
+            setSaleForm({ ...saleForm, customer_id: e.target.value })
           }
         >
-          <option value="cash">Cash</option>
-          <option value="transfer">Transfer</option>
-          <option value="card">Card</option>
+          <option value="">Select Customer</option>
+          {customers.map((c) => (
+            <option key={c.id} value={c.id}>
+              {c.name}
+            </option>
+          ))}
         </select>
-        <br /><br />
 
-        <button disabled={loading}>
-          {loading ? "Processing..." : "Save Sale"}
-        </button>
+        <input
+          placeholder="Total"
+          value={saleForm.total}
+          onChange={(e) =>
+            setSaleForm({ ...saleForm, total: e.target.value })
+          }
+        />
+
+        <input
+          placeholder="Paid"
+          value={saleForm.paid}
+          onChange={(e) =>
+            setSaleForm({ ...saleForm, paid: e.target.value })
+          }
+        />
+
+        <button>Save</button>
       </form>
+
+      <hr />
+
+      <h3>Sales History</h3>
+      <ul>
+        {sales.map((s) => (
+          <li key={s.id}>
+            {s.customer_name} - {s.total} ({s.paid} paid)
+          </li>
+        ))}
+      </ul>
     </div>
   );
 }

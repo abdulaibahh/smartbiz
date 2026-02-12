@@ -39,6 +39,8 @@ app.use(cors({
 app.use("/api/auth", require("./routes/auth.routes"));
 app.use("/api/sales", require("./routes/sales.routes"));
 app.use("/api/ai", require("./routes/ai.routes"));
+app.use("/api/customers", require("./routes/customers.routes"));
+app.use("/api/dashboard", require("./routes/dashboard.routes"));
 
 // =======================
 // HEALTH CHECK
